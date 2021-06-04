@@ -1,0 +1,144 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{enumerate}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{stackrel}
+
+% Helpful Shortcuts
+\newcommand{\bc}[1]{{\quad \text{(#1)}}} 	% Justification in math env
+\newcommand{\st}{{\text{ such that }}} 							   % Math env
+\newcommand{\abs}[1]{{ |#1 |}} 							% Absolute value / Cardinality
+\newcommand{\bld}[2]{\noindent\textbf{#1:}\hspace{0.1in}#2$  $\bigskip} % Headings
+\newcommand{\notimplies}{%
+	\mathrel{{\ooalign{\hidewidth$\not\phantom{=}$\hidewidth\cr$\implies$}}}}
+\newcommand{\linesep}{\noindent\bigskip\rule{17cm}{0.1mm}} % Horizontal Line
+
+% These define new environments / formats for lemmas, definitions, running time, etc.
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{notation}{Notation}
+\newtheorem*{claim}{Claim}
+\newtheorem{observation}{Observation}
+\newtheorem{conjecture}[lemma]{Conjecture}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem*{rt}{Running Time}
+\newcommand{\inv}{{^{-1}}}
+
+% These define nice ways to format P and OPT (use \P or \opt)
+\def\P{\ensuremath{$ \mathcal{P} $}}
+\def\opt{\ensuremath{\textsc{opt}}}
+\renewcommand{\labelenumi}{\bf \alph{enumi}.}
+
+\renewcommand\maketitle{
+	\begin{center}
+		\begin{tabular*}{6.44in}{l @{\extracolsep{\fill}}c r}
+			\bfseries  &  & \bfseries CSCI 383 Spring 2019 \\
+			\bfseries&  & \bfseries  Homework \#6 Solutions  \\
+			\bfseries   &   &  \bfseries Kai Ting Keshia Yap\\ 
+		\end{tabular*}
+\end{center} }
+
+\begin{document}
+	\maketitle
+	
+	\noindent Honor Code: I affirm that I adhered to the Honor Code in this assignment. Keshia Yap\\
+	\subsection*{Part 1: Which is Which?}
+	Below are three languages. For each language, either give a CFG (and explain why your CFG is correct - no formal proof necessary) or prove that it is not context-free using the context-free pumping lemma.
+	\begin{enumerate}
+		\item $ L_1=\{a^n b^m c^r\mid n+m=r\} $
+		\item $ L_2=\{a^nb^mc^r\mid n\times m=r\} $
+		\item $ L_3=\{x\in\{a,b\}^*\mid x$ is a palindrome and  $ \#a(x) = \#b(x)\}$
+		
+		Answer the following questions:
+		\item We proved in class that the languages $ P = \{x \in\{a, b\}^*\mid x $ is a palindrome$ \} $ and $ B=\{x\in\{a,b\}^*\mid \#a(x) = \#b(x)\}$ are context-free. How does $ L_3 $ relate to $ P $ and $ B $? What does this say about the closure of the set of CFLs under intersection?
+	\end{enumerate}
+	\linesep
+	\begin{enumerate}
+		\item This is context free; we can prove that it is a CFL by giving the CFG: 
+		\begin{itemize}
+			\item $ G_1=(N,\Sigma, P, S) $
+			\item $ \Sigma=\{a,b,c\} $
+			\item $ S\rightarrow \varepsilon \mid aSc \mid bEc $
+			\item $ E\rightarrow \varepsilon \mid bEc $
+		\end{itemize}
+		Informally, $ G_1 $ is the language of $ L_1 $ as for every production, it always adds the same number of $ a $'s and $ c $'s or the same number of $ b $'s and $ c $'s and it ensures that $ a $'s are always before $ b $'s which are always before $ c $'s.
+		\item This is not context free.
+		\begin{proof}
+			We proceed via the pumping lemma. Suppose, by way of contradiction that there exists a CFG $ G_2 $ with $ \ell $ non-terminals. Let $ k=2^{\ell+1} $. Then the string $ z=a^kb^kc^{k^2} \in L(G_2)$. By the pumping lemma, let $ uvwxy=z$ be a decomposition of $ z $, where $ \abs{vx}>0 $ and $ \abs{vwx}\leq k $. Observe that since $ vwx $ has length at most $ k $, $ vwx $ cannot contain three different letters. We will show that $ uv^2wx^2y\not\in A $, no matter how the decomposition is chosen. This will be done in the following cases, which are mutually exhaustive: 
+			
+			\begin{itemize}
+				\item Case 1:  At least one of $ v $  and $ x $ straddle two blocks. Let us call this string $ p $ for the sake of clarity. This means that $ p $ contains either both $ a $'s and $ b $'s, or both $ b $'s and $ c $'s, i.e. it contains the substring $ ab $ or $ bc $. By our observation, $ p $ has to be of the form $ a^sb^t $ or $ b^sc^t $, where $ s,t $ are positive integers and $ s+t\leq k $, and $ p^2= a^sb^ta^sb^t $ or $ b^sc^tb^sc^t  $, which contains the substring $ ba $ or $ cb $. So by the pumping lemma, $ uv^2wx^2y $ is derivable from $ G_2 $ but is not in $ A $, so $ L(G_2)\neq A $.\\
+				
+				\item Case 2: Neither $ v $ nor $ x $ straddle two blocks, both are non-empty strings, and $ v $ and $ x $ contain different characters. By our observation, and since $ v $ precedes $ x $, either $ v=a^s $ and $ x=b^t $ or $ v=b^s $ and $ x=c^t $ for some positive integers $ s,t $ where $ s+t\leq k $. Then $ uv^2wx^2y=a^{k+s} b^{k+t} c^{k^2} $ or $ a^k b^{k+s} c^{k^2+t} $. However, 
+				\begin{align*}
+					(k+s)(k+t)&=k^2+(s+t)k+st>k^2\\
+					\text{and } \qquad k(k+s)&=k^2+sk\geq k^2+k>k^2+t
+				\end{align*}
+				
+				 since $ s,t\geq 1 $. Therefore, $ uv^2wx^2y \not\in L_2$ but can be produced by $ G_2 $. So $ L(G_2)\neq A $.\\
+				
+				\item Case 3: Neither $ v $ nor $ x $ straddle two blocks, and $ v $ and $ x $ contain the same characters. By our observation, it follows that there can be only three cases: 
+				\begin{enumerate}
+					\item  $ v=a^s $ and $ x=a^t \implies  uv^2wx^2y=a^{k+s+t}b^{k}c^{k^2} $
+					\item $ v=b^s $ and $ x=b^t \implies  uv^2wx^2y=a^{k}b^{k+s+t}c^{k^2} $
+					\item $ v=c^s $ and $ x=c^t \implies  uv^2wx^2y=a^{k}b^{k}c^{k^2+s+t} $
+				\end{enumerate}
+			where $ 0<s+t\leq k $. Similar to the argument above, we see that since $ s+t $ is a positive integer, $ k(k+s+t)=k^2+(s+t)k\neq k^2 $ and $ k\cdot k\neq k^2+s+t $. Therefore, $ uv^2wx^2y \not\in L_2$ but can be produced by $ G_2 $.  So $ L(G_2)\neq A $.\\
+			
+				\item Case 4: Neither $ v $ nor $ x $ straddle two blocks, and exactly one of $ v $ and $ x $ is the empty string. The proof that $ uv^2wx^2y \not\in L_2$ is the same as the proof for Case 3, since it still holds that $ s+t $ is a positive integer.
+			\end{itemize}
+		\end{proof}
+		\item This is not context free.
+		\begin{proof}
+			We proceed via the pumping lemma. Suppose, by way of contradiction that there exists a CFG $ G_3 $ with $ \ell $ non-terminals such that $ L(G_3)=L_3 $. Let $ k=2^{\ell+1} $. Then the string $z:= a^kb^{2k}a^k \in L(G_3)$. By the pumping lemma, for any decomposition $ z=uvwxy $ or $ z $ where $ \abs{vx}>0 $ and $ \abs{vwx} \leq k$, the string $ uv^iwx^iy\in L(G_3) $ for any nonnegative integer $ i $. We will show that $ uv^2wx^2y\not\in A $ for any decomposition. 
+			\begin{itemize}
+				\item Case 1: $ \#a(vx)\neq \#b(vx)$. Then $ \#a(z)=\#b(z) $ implies that \[ \#a(uv^2wx^2y)=\#a(uvwxy)+\#a(vx)\neq \#b(uvwxy)+\#b(vx)=\#b(uv^2wx^2y).\] So $ uv^2wx^2y\not\in L_3 $.
+				\item Case 2: $ \#a(vx)=\#b(vx)$. Then since $ \abs{vx}\leq \abs{vwx}\leq k $, there can only be six options for $ v $ and $ x $ where $ s,t,p,q \leq k$ are integers such that $ 0<t<s$ and  $2s\leq k $.
+				\begin{enumerate}
+					\item $ v=a^s $, $ x=b^s$ 
+					\begin{align*}
+						&\implies u=a^{k-s-p}, \quad w=a^pb^q, \quad y=b^{2k-s-q}a^k\\
+						&\implies uv^2wx^2y= a^{k+s}b^{2k+s}a^k\\
+						&s>0\implies k+s> k \implies uv^2wx^2y \text{ is not a palindrome}
+					\end{align*}
+					\item $ v=a^sb^t $, $ x=b^{s-t} $
+					\begin{align*}
+					&\implies u=a^{k-s}, \quad w=b^q, \quad y=b^{2k-(s-t)-q}a^k\\
+					&\implies uv^2wx^2y= a^{k}b^ta^sb^{2k+(s-t)}a^k\\
+					&t<s<k \implies t\neq 2k+(s-t)\implies uv^2wx^2y \text{ is not a palindrome}
+					\end{align*}
+					\item $ v=b^s $, $ x=a^s $
+					\begin{align*}
+					&\implies u=a^{k}b^{2k-s-p}, \quad w=b^pa^q, \quad y=a^{k-s}\\
+					&\implies uv^2wx^2y= a^{k}b^{2k+s}a^{k+s}\\
+					&s>0\implies k< k+s \implies uv^2wx^2y \text{ is not a palindrome}
+					\end{align*}
+					\item $ v=b^sa^t $, $ x=a^{s-t} $
+					\begin{align*}
+					&\implies u=a^{k}b^{2k-s}, \quad w=a^q, \quad  y=a^{k-(s-t)}\\
+					&\implies uv^2wx^2y= a^{k}b^{2k}a^tb^sa^{k+(s-t)}\\
+					&s>t\implies k\neq k+(s-t)\implies uv^2wx^2y \text{ is not a palindrome}
+					\end{align*}
+					\item $ v=a^t $, $ x=a^{s-t}b^s $
+					\begin{align*}
+					&\implies u=a^{k-p-s}, \quad w=a^p, \quad y=b^{2k-s}a^{k}\\
+					&\implies uv^2wx^2y= a^{k+t}b^sa^{s-t}b^{2k}a^{k}\\
+					&t>0\implies k< k+t \implies uv^2wx^2y \text{ is not a palindrome}
+					\end{align*}
+					\item $ v=b^t $, $ x=b^{s-t}a^s $
+					\begin{align*}
+					&\implies u=a^{k}b^{2k-s-p}, \quad w=b^p, \quad  y=a^{k-s}\\
+					&\implies uv^2wx^2y= a^{k}b^{2k+t}a^sb^{s-t}a^{k}\\
+					&s,t<k\implies 2k+t>s-t\implies uv^2wx^2y \text{ is not a palindrome}
+					\end{align*}
+				\end{enumerate}
+			\end{itemize}
+		So $ L(G_3)\neq L_3 $.
+		\end{proof}
+		\item $ L_3=P\cap B $, where $ P $ and $ B $ are both context-free but $ L_3 $ is not. This means that context-free languages are not closed under intersection.
+	\end{enumerate}
+\end{document}

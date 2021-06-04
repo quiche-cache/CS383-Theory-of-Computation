@@ -1,0 +1,255 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{enumerate}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{stackrel}
+
+% Helpful Shortcuts
+\newcommand{\bc}[1]{{\quad \text{(#1)}}} 	% Justification in math env
+\newcommand{\st}{{\text{ such that }}} 							   % Math env
+\newcommand{\abs}[1]{{ |#1 |}} 							% Absolute value / Cardinality
+\newcommand{\bld}[2]{\noindent\textbf{#1:}\hspace{0.1in}#2$  $\bigskip} % Headings
+\newcommand{\notimplies}{%
+	\mathrel{{\ooalign{\hidewidth$\not\phantom{=}$\hidewidth\cr$\implies$}}}}
+\newcommand{\linesep}{\noindent\bigskip\rule{17cm}{0.1mm}\bigskip} % Horizontal Line
+
+% These define new environments / formats for lemmas, definitions, running time, etc.
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{notation}{Notation}
+\newtheorem*{claim}{Claim}
+\newtheorem{observation}{Observation}
+\newtheorem{conjecture}[lemma]{Conjecture}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem*{rt}{Running Time}
+
+% These define nice ways to format P and OPT (use \P or \opt)
+\def\P{\ensuremath{$ \mathcal{P} $}}
+\def\opt{\ensuremath{\textsc{opt}}}
+\renewcommand{\labelenumi}{\bf \alph{enumi}.}
+
+\renewcommand\maketitle{
+	\begin{center}
+		\begin{tabular*}{6.44in}{l @{\extracolsep{\fill}}c r}
+			\bfseries  &  & \bfseries CSCI 383 Spring 2019 \\
+			\bfseries&  & \bfseries  Module 2 Take-home Midterm Solutions  \\
+			\bfseries   &   &  \bfseries Kai Ting Keshia Yap\\ 
+		\end{tabular*}
+\end{center} }
+
+\begin{document}
+	\maketitle
+	
+	\noindent Honor Code: I affirm that I adhered to the Honor Code in this assignment. Keshia Yap\\
+	
+	
+	\subsection*{Part 1: Grammatically Correct}
+	Define $  B = \{x \mid x\in\{a,b\}^*, \#a(x) = 2\#b(x)\}. $
+	\begin{enumerate}
+	\item Specify a grammar $ G $ that generates $ B $.
+	\item Prove that $ L(G) \subseteq  B $.
+	\item Prove that $ B \subseteq L(G) $.
+	\end{enumerate}
+	\linesep
+	\begin{enumerate}
+		\item It is $ G=(\{S\},\{a,b\}, P,S) $ where the only production in $ P $ is
+		\begin{itemize}
+			\item $ S\rightarrow\varepsilon \mid  SS\mid aSbSa\mid aSaSb\mid bSaSa $
+		\end{itemize}
+		Let $ \alpha $ be a sentential form derivable from $ S $ in $ G $. We define $ d(\alpha):=  \#a(\alpha)-2\#b(\alpha) $. 
+		\item \begin{proof}
+			We proceed by induction on the number of steps of derivation. \\
+			
+			\textbf{Base Case:} $ S\xrightarrow[G]{0} \alpha $. This means that $ \alpha=S $, which has 0 $ a $'s and 0 $ b $'s, so $ d(\alpha)=0 $.
+			
+			\textbf{Inductive Hypothesis:} Assume that for all sentential forms $ \alpha $ derivable in $ n $ steps, $ d(\alpha) = 0 $.
+			
+			\textbf{Inductive Case:} Assume $ S\xrightarrow[G]{n+1}\alpha $. By definition of $ \xrightarrow[G]{n+1} $, $ S\xrightarrow[G]{n}\beta S\gamma \xrightarrow[G]{1}\alpha $. \\
+			
+			We examine each production of $ S $ in $ G $. By the inductive hypothesis: $ d(\beta S\gamma ) = 0 $.
+			\begin{align*}
+				 S\rightarrow \varepsilon : &&S\xrightarrow[G]{n}\beta S\gamma \xrightarrow[G]{1}\beta\gamma  : && d(\beta\gamma)=d(\beta S\gamma)=0\\
+				 S\rightarrow SS : &&S\xrightarrow[G]{n}\beta S\gamma \xrightarrow[G]{1}\beta SS\gamma : && d(\beta SS\gamma)=d(\beta S\gamma) + d(S)=0+0=0\\
+				 S\rightarrow aSbSa : &&S\xrightarrow[G]{n}\beta S\gamma \xrightarrow[G]{1}\beta aSbSa \gamma : && d(\beta aSbSa \gamma)=d(\beta S\gamma)+d(b)+2d(a)=0-2+2=0\\
+				 S\rightarrow aSaSb : &&S\xrightarrow[G]{n}\beta S\gamma \xrightarrow[G]{1}\beta aSaSb \gamma : && d(\beta aSaSb \gamma)=d(\beta S\gamma)+d(b)+2d(a)=0-2+2=0\\
+				 S\rightarrow bSaSa : &&S\xrightarrow[G]{n}\beta S\gamma \xrightarrow[G]{1}\beta bSaSa \gamma : && d(\beta bSaSa \gamma)=d(\beta S\gamma)+d(b)+2d(a)=0-2+2=0
+			\end{align*}
+		
+		So for all $ \alpha $ such that $ S\xrightarrow[G]{*}\alpha $ and $ \alpha\in\{a,b\}^* $, $ \alpha \in B$. So $ L(G)\subseteq B $.
+		\end{proof}
+		\item \begin{proof}
+			Suppose $ x\in B $ and $ x\in\{a,b\}^* $. We proceed via strong induction on the length of $ x $.
+			
+			\textbf{Base Case:} $ \abs{x}=0 \implies x=\varepsilon$. Indeed, we have $ S\xrightarrow[G]{1}\varepsilon$.
+			
+			\textbf{Inductive Hypothesis:} Assume for all $ x\in\{a,b\}^*  $ of length $ \ell\leq n $, if $ d(x) = 0 $, then $ S\xrightarrow[G]{*} x$.
+			
+			\textbf{Inductive Case:} Assume $ \abs{x}=n+1 $, and $ x=x_1x_2\dots x_{n+1} $ where $ x_i\in\Sigma $ for all $ i\in\{1,2,\dots,n+1\} $. We can plot the graph of $ z(y(i)):=d(x_1\dots x_i) $ over $ y(i):=i $. Note: since $ x\in B $, we have that $ d(x)=0 $. Moreover, we also have $ d(\varepsilon)=0 $ trivially, so $ z(0)=0=z(n+1) $.
+			\begin{itemize}
+				\item \textbf{Case 1:} Suppose the graph crosses the $ y $-axis at some $ k\in\mathbb{Z} $ where $ 1\leq k\leq n $. Then there exists $ u,v\in\Sigma^* $ such that $ x=uv $ and $ d(u)=0=d(v) $, where $ \abs{u}=k $ and $ \abs{v}=n+1-k $. Since $ 1\leq k\leq n  $, $ \abs{u}, \abs{v}\leq n $ and so by the inductive hypothesis, $ S\xrightarrow[G]{*} u$ and $ S\xrightarrow[G]{*} v $. So \[S\xrightarrow[G]{1} SS \xrightarrow[G]{*} uS \xrightarrow[G]{*} uv=x.\] 
+				
+				\item \textbf{Case 2:} Suppose that the graph crosses the $ y$-axis at some non-integer value $ k $, and doesn't cross the $ y $-axis at any other integer values of $ y $. Since reading the character $ a $ is equivalent to drawing a line with gradient 1 and reading the character $ a $ is equivalent to drawing a line with gradient $ -2 $, such a non-integer value $ k $ has to be $ k=s+0.5 $ where $ s $ is an integer, by a line of gradient $ -2 $ (as a $ b $ was read). Since $ d(s)=1 $, $ x $ could not start with a $ b $, since otherwise the graph would have to cross the $ y $-axis at $ s-1 $ to cross from negative to positive. Similarly, since $ d(s+1)=-1 $, $ x $ could not end with a $ b $. So $ d(x_2\cdots x_s)=0 $ and $ d(x_{s+1}\cdots x_{n+1})=0 $. Let $ \gamma_1:=x_2\cdots x_s $ and $ \gamma_2:= x_{s+1}\cdots x_{n+1}$. Then $ d(\gamma_1)=d(\gamma_2)=0 $ and $ x= a\gamma_1 b\gamma_2 a $. Using the inductive hypothesis, we have \[S\xrightarrow[G]{1} aSbSa \xrightarrow[G]{*} a\gamma_1 bSa \xrightarrow[G]{*} a\gamma_1 b\gamma_2 a=x.\] 
+				
+				\item \textbf{Case 3:} Suppose that $ d(i)>0 $ for all $ i\in[1,n] $. Since $ d(a)=1 $ and $ d(b)=-2 $, we must have $ d(1)=1 $. Also, $ d(2)>1 $ since it cannot be equal to $ d(1) $, so $ d(2)=2 $. This means that the string must start with $ aa $. Moreover, since $ d(n+1)=0 $ and $ d(n)>0 $, we must have $ d(n)=2 $ (i.e the string ends with a $ b $). So $ x=aa\gamma b $. Then $ d(\gamma)=d(x)-d(aa)-d(b)=0 $. By the inductive hypothesis, $ S\xrightarrow[G]{*} \gamma$. So \[S\xrightarrow[G]{1} aSaSb \xrightarrow[G]{1} aaSb \xrightarrow[G]{*} aa\gamma b.\] 
+				
+				\item \textbf{Case 4:} Suppose that $ d(i)<0 $ for all $ i\in[1,n] $. Then we must have $ d(1)=-2 $ (i.e. the string must start with $ b $). Moreover, since $ d(n+1)=0 $ and $ d(n)<0 $, we must have $ d(n)=-1 $. Since $ d(n-1)<0 $ and cannot be equal to $ -1 $, $ d(n-1)=-2 $. This means tthat the string ends with an $ aa $. So $ x=b\gamma aa $. Then $ d(\gamma)=d(x)-d(aa)-d(b)=0 $. By the inductive hypothesis, $ S\xrightarrow[G]{*} \gamma$. So \[S\xrightarrow[G]{1} bSaSa \xrightarrow[G]{1} bSaa \xrightarrow[G]{*} b\gamma aa.\] 
+			\end{itemize}
+		So for all $ \alpha $ such that $ \alpha\in\{a,b\}^* $ and $ \#a(\alpha)=2\#b(\alpha) $, there exists transitions such that $ S\xrightarrow[G]{*}\alpha $. So $ L(G)\supseteq B $.
+		\end{proof}
+	\end{enumerate}
+	\newpage
+	\subsection*{Part 2: Sandwiches}
+	For each of the four languages below, either prove the langauge is not context-free or give an NPDA
+	for the language. You do not need to prove correctness of your NPDAs, but you should include
+	both an informal description of how your automaton works, as well as a formal description.
+	\begin{enumerate}
+	\item  Let $ b(n) $ be the number n expressed in binary. Let $ L_1 \subseteq \{0, 1, \$\}^* $ be given by
+	\[ L_1 = \{b(n)\$b(n + 1)| n \geq 0\}\]
+	\item  Let $ b(n) $ be the number n expressed in binary. Let $ L_2 \subseteq \{0, 1, \$\}^* $ be given by
+	\[L_2 = \{b(n)\$b(n + 1)^R | n \geq 0\},\]
+	where the reverse operator applies only to $ b(n + 1) $.
+	\item $ L_3 = \{wtw^R \mid w, t \in \{0, 1\}^* $ and $ \abs{w}=\abs{t}\} $
+	\item $ L_4 = \{wtw^R \mid w, t \in \{0, 1\}^*\} $
+	\end{enumerate}
+	\linesep
+	\begin{enumerate}
+		\item $ L_1 $ is not context-free.
+		\begin{proof} 
+			We proceed by the pumping lemma. Suppose $ L_1 $ is context-free. Then there exists a CFG $ G $ in CNF with $ \ell $ non-terminals such that $ L(G)=L_1 $. Let $ k:=2^{\ell+1} $. Then the string $ x:=1^k0^k\$1^k0^{k-1}1\in L(G) $. Now, by the pumping lemma, for any decomposition $ x=uvzxy $ where $ \abs{vx}>0 $ and $ \abs{vzx}\leq k $, the string $ uv^izx^iy $ for any $ i\geq 0 $ is in $ L(G_3) $. So $ x':= uv^2zx^2y\in L(G_1) $. 
+			\begin{itemize}
+				\item \textbf{Case 1:} The substring $ vx $ contains $ \$ $. Then $  uv^2zx^2y $ would contain more than one $ \$ $ symbols, and would automatically not be in the language of $ L_1 $.
+				\item \textbf{Case 2:} The substring $ vx $ is on only one side of $ \$ $. Then the number expressed by one side of $ \$ $ remains the same while the other is changed. However, since addition is well-defined, this new string $ x' $ cannot be in the language. 
+				\item \textbf{Case 3:} The substring $ vx $ spans both sides of $ \$ $. Then since $ \abs{vwx}\leq k $, there must exist integers $ s,t $ such that $ v=0^s $ and $ x=1^t $. However, that means that $ x'= 1^k0^{k+s}\$1^{k+t}0^{k-1}1$. If $ b(n)=1^k0^{k+s} $ then $ b(n+1)=1^k0^{k+s-1}1 $, which is not what is on the right hand side of $ \$ $ unless $ s=0=t $ which cannot be true since $ \abs{vx}>0 $.
+			\end{itemize}
+		\end{proof}
+		\item $ L_2 $ is context-free. Let $ G_2=(\{s,q,q',p,p'\}, \{0,1,\$\}, \{\bot,A,B\}, \delta, s, \bot) $ be an NPDA that accepts by empty stack, where $ \delta $ is given by:
+		\begin{enumerate}
+			\item Initialize stack 
+			\begin{itemize}
+				\item $ ((s,0,\bot),(s,A\bot) $ % init
+				\item $ ((s,1,\bot),(s,B\bot) $
+			\end{itemize}
+			\item Build stack
+			\begin{itemize}
+				\item $ ((s,0,A),(s,AA) $ % build
+				\item $ ((s,0,B),(s,AB) $
+				\item $ ((s,1,A),(s,BA) $
+				\item $ ((s,1,B),(s,BB) $
+			\end{itemize}
+			\item Read $ \$ $ character
+			\begin{itemize}
+				\item $ ((s,\$,A),(q,A) $ % trans
+				\item $ ((s,\$,B),(p,B) $
+			\end{itemize}
+			\item Read first character after $ \$ $
+			\begin{itemize}
+				\item $ ((q,1,A),(q',\varepsilon) $ % firsts
+				\item $ ((p,0,B),(p',\varepsilon) $
+			\end{itemize}
+			\item Tear down stack
+			\begin{itemize}
+				\item $ ((q',0,A),(q',\varepsilon) $ % tear
+				\item $ ((q',1,B),(q',\varepsilon) $
+				\item $ ((p',0,B),(p',\varepsilon) $
+				\item $ ((p',1,A),(q',\varepsilon) $
+				\item $ ((q',0,A),(q',\varepsilon) $ 
+			\end{itemize}
+			\item Empty the stack
+			\begin{itemize}
+				\item $ ((p',1,\bot),(p',\varepsilon) $ % end
+				\item $ ((q',\varepsilon,\bot),(q',\varepsilon) $
+			\end{itemize}
+		\end{enumerate}
+		\begin{proof}
+			This NPDA reads strings in several stages: 
+			\begin{enumerate}
+				\item It reads the first character. If it is a 0, it adds an $ A $. Otherwise, it adds a $ B $. 
+				\item It reads numbers adding $ A $s or $ B $s for each $ 0 $ or $ 1 $ read respectively.
+				\item It reads $ \$ $, and changes state depending on what the last character (denoted $ c $) was.
+				\item It accepts only the character $ c+1\pmod 2 $ and changes state, $ p' $ or $ q' $ given the initial state $ p $ or $ q $ respectively.
+				\item It reads subsequent characters. If $ b(n)=\gamma 0 $, then $ b(n+1)^R =0\gamma^R$. Therefore, if $ c=0 $, then it has to be in state $ q' $, and reads only characters corresponding to the top of the stack. Otherwise, $ c=1 $ and it starts in state $ p' $. If $ b(n)=\gamma 0 1^k $ then $ b(n+1)^R= 0^k 1 \gamma^R$ by the carry-over in addition of binary numbers. So it reads only 0s as long as the top of the stack is $ B $. Otherwise, it removes the top of the stack and transitions to the state $ q' $. Otherwise, $ b(n)=1^k $. Then $ b(n+1)^R=0^k 1 $. The stack can only be emptied when the same number of 0s were read as the number of 1s initially. Note that any other string followed by $ \$ $ that is not $ b(n+1)^R $ will cause the NPDA to get stuck at some step. 
+				\item Note from the earlier explanation that if there was some 0 in the first string, then the length of $ b(n) $ should be equal to that of $ b(n+1) $, so the stack can be only emptied if it's in state $ q' $ if what is left is just an empty string. Otherwise, the length of $ b(n+1) $ is exactly 1 greater than $ b(n) $, and the final character read has to be 1. So in state $ p' $, the stack can be emptied only by reading the character 1. 
+			\end{enumerate}
+		\end{proof}
+		\item $ L_3 $ is not context-free.
+		\begin{proof}
+			Suppose $ L_3 $ is context-free. Then there exists a CFG $ G_3 $ in CNF with $ \ell $ non-terminals such that $ L(G_3)=L_3 $. Let $ k:=2^{\ell+1} $. Then the string $ 1^{3k}0^k1^{2k} \in L_3=L(G) $, where $ w=1^{2k} $ and $ t=1^k0^k $ (clearly, $ \abs{w}=\abs{t}=2k $). Now, by the pumping lemma, for any decomposition $ x=uvzxy $ where $ \abs{vx}>0 $ and $ \abs{vzx}\leq k $, the string $ uv^izx^iy $ for any $ i\geq 0 $ is in $ L(G_3) $. So $ uv^2zx^2y\in L(G_3) $. 
+			\begin{itemize}
+				\item \textbf{Case 1:} 
+			\end{itemize}
+		\end{proof}
+		\item $ L_4 $ is context-free. Let $ G=(\{s\},\{0,1\},\{\bot\},\delta,s,\bot) $ be an NPDA that accepts by empty stack where $ \delta $ transitions are given by:
+		\begin{enumerate}
+			\item $ ((s,a,\bot),(s,\bot)$
+			\item $ ((s,b,\bot),(s,\bot)$
+			\item $ ((s,\varepsilon,\bot),(s,\varepsilon)$
+		\end{enumerate}
+		We claim that $ L_4=L(G_4) $.
+		\begin{proof}
+			It is easy to see that $ G_4 $ can produce any string of 0s and 1s of any length, so $ L(G_4)=\{0,1\}^* $, since both the state and stack are preserved after reading any character, and the machine can empty the bot symbol anytime. We want to show that $ \{0,1\}^* = L_4 $. Consider $ x\in L_4 $. There exists some decomposition $ x=wtw^R $. Since this string is made of 1s and 0s, it is in $ \{0,1\}^*  $. Now consider any string $ x $ in $ \{0,1\}^*  $. It is equivalent to the string $ \varepsilon x \varepsilon^R $, taking $ w=\varepsilon $, so it is in $ L_4 $.
+		\end{proof}
+	\end{enumerate}
+	
+	\newpage
+	\subsection*{Part 3: False or False}
+	Given a language $ A $, define $ root(A) = \{x \mid xx \in A\} $. For example, if $ A = \{aa, abc, aabb, acac, abccba\} $,
+	then $ root(A) = \{a, ac\} $. Define $ perm(A) = \{x \mid x $ is a permutation of $ y \in A\} $. For example, if
+	$ A = \{ab, acca\} $, then $ perm(A) = \{ab, ba, aacc, acac, acca, caac, caca, ccaa\} $. Disprove the following
+	statements.
+	\begin{enumerate}
+	\item  If $ A $ is context free, then $ root(A) $ must be context free.
+	\item If $ A $ is context free, then $ perm(A) $ must be context free.
+	\end{enumerate}
+	If for either part you end up using a language $ A $ which we have not proved context-free in
+	class/homework/the book, give a grammar or NPDA for it, and briefly explain your construction.
+	\linesep
+	
+	\begin{lemma}
+		Context-free languages are closed under concatenation.
+	\end{lemma}
+	\begin{proof}
+		Suppose $ L_1 $ and $ L_2 $ are languages that are context-free. Then by a theorem from class, there exists context-free grammars $ G_1=(N_1,\Sigma_1,P_1,S_1)  $ and $ G_2=(N_2,\Sigma_2,P_2,S_2) $ such that $ L(G_1)=L_1 $ and $ L(G_2)=L_2 $. Now, rename all the states of $ G_1 $ and $ G_2 $ such that they are all pairwise distinct. Create a new grammar $ G=(N,\Sigma_1\cup \Sigma_2, P, S) $ where $ P=P_1\cup P_2\cup \{S\rightarrow S_1S_2\} $. Then it is clear that if $ \alpha_1\in \Sigma_1^*$, $ \alpha_2\in \Sigma_2^*$, then \[S_1\xrightarrow[G]{*}\alpha_1 \text{ and }S_2\xrightarrow[G_2]{*}\alpha_2 \iff  S\xrightarrow[G]{1}S_1S_2\xrightarrow[G]{*}\alpha_1S_2\xrightarrow[G]{*}\alpha_1\alpha_2 \] 
+	\end{proof}
+
+	\begin{enumerate}
+		\item Consider the language $ L_1:=\{a^mb^na^{2n}b^\ell a^p\mid m,n,\ell,p\geq 1\} $. This is is the concatenation of languages $ L_A:=\{a^n\mid n\geq 1\} $, $ L_B:=\{b^n\mid n\geq 1\} $ and $ L:=\{b^na^{2n} \mid n\geq 1\} $ in the form $ L_1=L_ALL_AL_BL_A $. Since $ L $ is the language $ \{a^nb^{n} \mid n\geq 1\} $ under the character replacement $ a\mapsto b, b\mapsto aa $, and we showed in class that $ \{a^nb^{n} \mid n\geq 1\}  $ is context-free, $ L $ is context-free by Lemma 2. It is clear that the NPDAs $ A\rightarrow aA\mid a $ and $ B\rightarrow bB\mid b $ produce $ L_A $ and $ L_B $ respectively, so they are both context-free. By Lemma 1, $ L_1 $ is context-free. \\
+		
+		Alternatively, we can consider the following NPDA $ G=({S,A,B,C}, \{a,b\}, P,S) $ for $ L_1 $ where $ P $ is given by:
+		\begin{itemize}
+			\item $ S\rightarrow ACBA $
+			\item $ A\rightarrow aA\mid a $ 
+			\item $ B\rightarrow bB\mid b $
+			\item $ C\rightarrow bCaa \mid baa $
+		\end{itemize}
+	
+		So $ L_1 $ is context-free. We claim that $root(L_1)=\{a^nb^n a^n\mid n\geq 1\} $. We have shown in class that this is not context-free, so $ L_1 $ would be a counter-example to the claim \textbf{a.} above. It remains to prove that $ root(L_1)=\{a^nb^n a^n\mid n\geq 0\}  $.
+		\begin{proof}
+			Let $ x= a^kb^k a^k$ for some $n\geq 0$. Then $ xx=a^kb^k a^k a^kb^k a^k $ which is in $ L_1 $ where $ m=n=\ell=p=k $. So $ root(L_1)\supseteq \{a^nb^n a^n\mid n\geq 0\} $.
+			
+			If $ x\in root(L_1) $, then $ xx\in L_1 $. That is, there exists integers $ m,n,\ell, k\geq 1 $ such that $ xx= a^mb^na^{2n}b^\ell a^p $. 
+		\end{proof}
+	
+		\item Consider the language $L_2:= \{(ab)^n c^n \mid n\geq 0\} $.  We see that this language is the same as the language $  \{a^n b^n \mid n\geq 0\}  $ under the character replacement $ a\mapsto ab, b\mapsto c $ Since context-free languages are closed under character replacement, $ L_2 $ is context-free. However, we claim that $ perm(L_2) $ is not context-free. 
+		\begin{proof}
+			Observe that if $ x\in perm(L_2) $ then $ x=(ab)^kc^k $ for some integer $ k $, so $ \#a(x)= \#b(x)= \#c(x) $. Now, if $ \alpha\in\Sigma^* $ such that $k:= \#a(\alpha)= \#b(\alpha)= \#c(\alpha) $ then we can permute it to be in the form $ (ab)^kc^k $, so $ \alpha\in perm(L_2) $. Therefore, \[perm(L_2) =\{\alpha\mid \#a(\alpha)= \#b(\alpha)= \#c(\alpha) \}. \] 
+			
+			For any $ \alpha\in\Sigma^* $, define $ d(\alpha):= \pi(\#a(\alpha)- \#b(\alpha)) - \#b(\alpha)-\#c(\alpha)$. Then
+			\begin{align*}
+				d(\alpha)=0 &\iff \pi(\#a(\alpha)- \#b(\alpha)) - \#b(\alpha)-\#c(\alpha) =0 &&\bc{by definition}\\
+				&\iff 0=\#a(\alpha)- \#b(\alpha)=\#b(\alpha)- \#c(\alpha) &&\bc{since $ \pi $ is transcendental}\\
+				&\iff  \#a(\alpha)= \#b(\alpha)= \#c(\alpha)&&\bc{by transitivity}\\
+				& \iff \alpha\in perm(L_2)&&\bc{from above}
+			\end{align*}
+			
+			Now suppose by way of contradiction that $  perm(L_2)  $ is context-free. Then there exists a CFG $ G $ in CNF with $ \ell $ non-terminals such that $ L(G)= perm(L_2) $. Let $ k:=2^{\ell+1} $. Then the string $ \alpha:=a^kb^kc^k \in  perm(L_2) =L(G) $ since it is a permutation of the string $ (ab)^kc^k $. Now, by the pumping lemma, for any decomposition $ \alpha=uvwxy $ where $ \abs{vx}>0 $ and $ \abs{vwx}\leq k $, the string $ uv^iwx^iy $ for any $ i\geq 0 $ is in $ L(G) $. \\
+			
+			Since $ \abs{vwx}\leq k $, the contiguous substring $ vwx $ can span at most two characters in $ \alpha $. Since $ \abs{vx}>0 $, the contiguous substring $ vwx $ cannot be empty. So at least one of $ \#a(vx),\#b(vx),\#c(vx) $ is 0 and at least 1 of the same set is non-zero. So $ d(vx)\neq 0 $.\\
+			
+			By the pumping lemma, $ uv^2wx^2y \in L(G)$. Since $ d $ is linear, $ d(uv^2wx^2y) =d(uvwxy)+d(v)+d(x)=0+d(vx)\neq 0$. So $ uv^2wx^2y \not\in perm(L_2) $. Contradiction.
+		\end{proof}
+	\end{enumerate}
+\end{document}
